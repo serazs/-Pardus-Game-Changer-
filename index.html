@@ -1,169 +1,675 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pardus Hyperion - Pop!_OS Edition</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pardus Hyperion | System Controller</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-        :root { --pure-black: #000000; --accent-white: #ffffff; --glass-border: rgba(255, 255, 255, 0.1); --glass-bg: rgba(255, 255, 255, 0.02); }
-        body { font-family: 'Outfit', sans-serif; background-color: var(--pure-black); color: var(--accent-white); -webkit-font-smoothing: antialiased; overflow: hidden; }
-        .font-heading { font-family: 'Space Grotesk', sans-serif; }
-        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0); background-size: 32px 32px; z-index: -1; }
-        .cyber-panel { background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(30px); border-radius: 1.25rem; transition: all 0.4s ease; }
-        .cyber-panel:hover { border-color: rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.04); }
-        .page-content { display: none; animation: slideIn 0.4s ease-out; }
-        .page-content.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .sidebar-icon { cursor: pointer; transition: all 0.4s; padding: 1rem; border-radius: 1rem; color: rgba(255,255,255,0.2); }
-        .sidebar-icon.active { color: white; background: rgba(255,255,255,0.08); }
-        .fan-spin { animation: spin 2s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.01) 50%, transparent 50%); background-size: 100% 4px; z-index: 100; pointer-events: none; opacity: 0.3; }
-    </style>
-</head>
-<body class="h-screen flex flex-col">
-    <div class="grid-bg"></div>
-    <div class="scan-line"></div>
-
-    <header class="h-20 px-10 flex items-center justify-between border-b border-white/10 bg-black/60 backdrop-blur-3xl z-50">
-        <div class="flex items-center gap-6">
-            <div class="w-12 h-12 bg-white flex items-center justify-center rounded-xl">
-                <i data-lucide="zap" class="w-7 h-7 text-black"></i>
-            </div>
-            <div>
-                <h1 class="font-heading font-black text-2xl tracking-tighter uppercase">PARDUS <span class="font-light opacity-30">HYPERION</span></h1>
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                    <span class="text-[9px] font-bold text-white/40 tracking-widest uppercase">Pop!_OS Engine v2.0</span>
-                </div>
-            </div>
-        </div>
-        <div class="flex flex-col items-end">
-            <span class="text-[9px] font-bold text-white/20 uppercase">CPU CLOCK</span>
-            <span class="text-xl font-heading font-bold" id="clock-speed">4.20 GHz</span>
-        </div>
-    </header>
-
-    <div class="flex-1 flex overflow-hidden">
-        <aside class="w-24 border-r border-white/10 flex flex-col items-center py-10 gap-6 bg-black/40">
-            <div onclick="showPage('dashboard', this)" class="sidebar-icon active"><i data-lucide="layout-dashboard" class="w-6 h-6"></i></div>
-            <div onclick="showPage('gaming', this)" class="sidebar-icon"><i data-lucide="gamepad-2" class="w-6 h-6"></i></div>
-            <div onclick="showPage('system', this)" class="sidebar-icon"><i data-lucide="cpu" class="w-6 h-6"></i></div>
-            <div class="mt-auto" onclick="runTask('cleanup')"><i data-lucide="trash-2" class="w-6 h-6 text-white/20 hover:text-red-500 cursor-pointer"></i></div>
-        </aside>
-
-        <main class="flex-1 p-10 overflow-y-auto">
-            <div class="max-w-[1200px] mx-auto">
-                
-                <div id="page-dashboard" class="page-content active space-y-6">
-                    <div class="cyber-panel p-10 relative overflow-hidden group">
-                        <h2 class="text-6xl font-heading font-black tracking-tighter mb-4 leading-none uppercase">Core<br>Gaming Boost</h2>
-                        <p class="text-white/40 max-w-md mb-8 text-sm">Pop!_OS çekirdek optimizasyonlarını, GameMode ve Vulkan kütüphanelerini Pardus'a entegre eder.</p>
-                        <button onclick="runTask('pop_core')" class="px-10 py-4 bg-white text-black font-black text-xs tracking-widest rounded-xl hover:scale-105 transition-all uppercase">Sistemi Yükselt</button>
-                        <i data-lucide="zap" class="absolute -right-10 -bottom-10 w-64 h-64 text-white/[0.02] -rotate-12"></i>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="cyber-panel p-6 border-blue-500/20">
-                            <i data-lucide="music" class="w-8 h-8 text-blue-500 mb-4"></i>
-                            <h3 class="font-bold mb-1 uppercase text-sm">Low-Latency Audio</h3>
-                            <p class="text-white/40 text-[11px] mb-4">Pipewire ile ses gecikmesini sıfıra indirin.</p>
-                            <button onclick="runTask('audio')" class="text-[10px] font-black text-blue-500 uppercase">Aktif Et</button>
-                        </div>
-                        <div class="cyber-panel p-6 border-yellow-500/20">
-                            <i data-lucide="layers" class="w-8 h-8 text-yellow-500 mb-4"></i>
-                            <h3 class="font-bold mb-1 uppercase text-sm">Pro Tweaks</h3>
-                            <p class="text-white/40 text-[11px] mb-4">ZRAM ve Network paket optimizasyonu.</p>
-                            <button onclick="runTask('pro_tweaks')" class="text-[10px] font-black text-yellow-500 uppercase">Uygula</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="page-gaming" class="page-content space-y-6">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="cyber-panel p-8">
-                            <i data-lucide="monitor" class="w-10 h-10 mb-6 text-green-500"></i>
-                            <h3 class="text-xl font-bold mb-2">Graphics & GPU</h3>
-                            <button onclick="runTask('gpu')" class="w-full py-4 bg-white/5 border border-white/10 rounded-xl font-bold text-[10px] uppercase">Sürücüleri Kur</button>
-                        </div>
-                        <div class="cyber-panel p-8">
-                            <i data-lucide="play-circle" class="w-10 h-10 mb-6 text-indigo-500"></i>
-                            <h3 class="text-xl font-bold mb-2">Steam & Suite</h3>
-                            <button onclick="runTask('gaming_suite')" class="w-full py-4 bg-white/5 border border-white/10 rounded-xl font-bold text-[10px] uppercase">Platformları Kur</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="page-system" class="page-content space-y-6">
-                    <div class="cyber-panel p-8 flex items-center justify-between">
-                        <div class="flex items-center gap-6">
-                            <i data-lucide="fan" class="w-12 h-12 fan-spin text-red-500"></i>
-                            <div>
-                                <h3 class="font-bold text-lg uppercase">XanMod Pro Kernel</h3>
-                                <p class="text-white/40 text-[11px] uppercase tracking-widest font-bold">Performans Odaklı Çekirdek</p>
-                            </div>
-                        </div>
-                        <button onclick="runTask('kernel')" class="px-8 py-3 bg-white text-black font-black text-[10px] rounded-lg uppercase">Yükle</button>
-                    </div>
-                    <div class="cyber-panel p-8 flex items-center justify-between">
-                        <div class="flex items-center gap-6">
-                            <i data-lucide="message-square" class="w-12 h-12 text-purple-500"></i>
-                            <div>
-                                <h3 class="font-bold text-lg uppercase">Social & Stream</h3>
-                                <p class="text-white/40 text-[11px] uppercase tracking-widest font-bold">Discord & OBS Studio</p>
-                            </div>
-                        </div>
-                        <button onclick="runTask('social')" class="px-8 py-3 bg-purple-600 font-black text-[10px] rounded-lg uppercase">Hepsini Kur</button>
-                    </div>
-                </div>
-
-                <div class="mt-10 cyber-panel p-5 bg-black/60 font-mono text-[10px] border-white/5 flex items-center gap-4">
-                    <div id="status-dot" class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span id="terminal-msg" class="text-white/50 uppercase tracking-widest">Sistem hazır, emirlerinizi bekliyorum...</span>
-                </div>
-
-            </div>
-        </main>
-    </div>
-
-    <script>
-        lucide.createIcons();
-        function showPage(pId, el) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + pId).classList.add('active');
-            document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
+        :root{
+            --bg-main:#000000;
+            --bg-card:rgba(255,255,255,0.03);
+            --border-color:rgba(255,255,255,0.08);
+            --accent-primary:#ffffff;
+            --accent-secondary:#a1a1aa;
         }
-        function log(m) { document.getElementById('terminal-msg').innerText = m; }
-        
-        async function runTask(task) {
-            const dot = document.getElementById('status-dot');
-            dot.className = "w-2 h-2 bg-yellow-500 animate-ping";
-            log(`[İSLEM] ${task.toUpperCase()} YÜRÜTÜLÜYOR...`);
 
-            if (window.pywebview) {
-                let res = "";
-                if(task === 'pop_core') res = await pywebview.api.pop_os_core_boost();
-                if(task === 'gpu') res = await pywebview.api.install_gpu_drivers();
-                if(task === 'gaming_suite') res = await pywebview.api.install_gaming_suite();
-                if(task === 'social') res = await pywebview.api.install_social_obs();
-                if(task === 'kernel') res = await pywebview.api.optimize_cpu_kernel();
-                if(task === 'cleanup') res = await pywebview.api.cleanup_system();
-                if(task === 'audio') res = await pywebview.api.setup_audio();
-                if(task === 'pro_tweaks') res = await pywebview.api.apply_pro_tweaks();
-                
-                log(`[TAMAMLANDI] ${res}`);
-                dot.className = "w-2 h-2 bg-green-500";
+        *{
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:'Space Grotesk',sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(255,255,255,0.03), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(255,255,255,0.02), transparent 30%),
+                #000;
+            color:white;
+            overflow:hidden;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        /* GRID */
+        body::before{
+            content:"";
+            position:fixed;
+            inset:0;
+            background-image:
+                radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size:30px 30px;
+            pointer-events:none;
+            z-index:-2;
+        }
+
+        /* SCANLINE */
+        body::after{
+            content:"";
+            position:fixed;
+            inset:0;
+            background:
+                linear-gradient(
+                    to bottom,
+                    transparent,
+                    rgba(255,255,255,0.015) 50%,
+                    transparent 50%
+                );
+            background-size:100% 4px;
+            opacity:0.25;
+            pointer-events:none;
+            z-index:-1;
+        }
+
+        .mono{
+            font-family:'JetBrains Mono', monospace;
+        }
+
+        header{
+            background:rgba(0,0,0,0.65);
+            backdrop-filter:blur(20px);
+            border-bottom:1px solid rgba(255,255,255,0.08);
+        }
+
+        .panel{
+            position:relative;
+            background:rgba(255,255,255,0.03);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:1rem;
+            backdrop-filter:blur(18px);
+            overflow:hidden;
+
+            transition:
+                transform .25s ease,
+                border-color .25s ease,
+                background .25s ease;
+        }
+
+        .panel:hover{
+            transform:translateY(-3px);
+            border-color:rgba(255,255,255,0.2);
+            background:rgba(255,255,255,0.05);
+        }
+
+        .panel::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            border-radius:inherit;
+            padding:1px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,0.12),
+                    transparent 40%
+                );
+
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+
+            -webkit-mask-composite:xor;
+            mask-composite:exclude;
+
+            pointer-events:none;
+        }
+
+        .sidebar-item{
+            cursor:pointer;
+            transition:all .25s ease;
+            position:relative;
+        }
+
+        .sidebar-item:hover{
+            background:rgba(255,255,255,0.05);
+            transform:translateX(3px);
+        }
+
+        .sidebar-item.active{
+            background:rgba(255,255,255,0.08);
+            color:white;
+        }
+
+        .sidebar-item.active::before{
+            content:'';
+            position:absolute;
+            left:0;
+            top:25%;
+            height:50%;
+            width:3px;
+            background:white;
+            border-radius:0 4px 4px 0;
+        }
+
+        .page-content{
+            display:none;
+            animation:fadeIn .3s ease-out;
+        }
+
+        .page-content.active{
+            display:flex;
+            flex-direction:column;
+            gap:1.5rem;
+        }
+
+        @keyframes fadeIn{
+            from{
+                opacity:0;
+                transform:translateY(4px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
             }
         }
 
-        setInterval(() => {
-            const freq = (Math.random() * (4.8 - 4.1) + 4.1).toFixed(2);
-            document.getElementById('clock-speed').innerText = freq + " GHz";
-        }, 1500);
-    </script>
+        .btn-primary{
+            background:white;
+            color:black;
+            font-weight:700;
+            letter-spacing:1px;
+            text-transform:uppercase;
+            padding:.7rem 1.3rem;
+            border-radius:.8rem;
+            font-size:.75rem;
+
+            box-shadow:
+                0 0 25px rgba(255,255,255,0.15);
+
+            transition:all .25s ease;
+        }
+
+        .btn-primary:hover{
+            transform:scale(1.03);
+        }
+
+        .btn-primary:disabled{
+            opacity:.5;
+            cursor:not-allowed;
+        }
+
+        .btn-outline{
+            border:1px solid rgba(255,255,255,0.1);
+            background:rgba(255,255,255,0.03);
+            color:white;
+            padding:.7rem 1.3rem;
+            border-radius:.8rem;
+            font-size:.75rem;
+            transition:all .25s ease;
+        }
+
+        .btn-outline:hover{
+            background:rgba(255,255,255,0.08);
+            border-color:rgba(255,255,255,0.2);
+        }
+
+        ::-webkit-scrollbar{
+            width:6px;
+        }
+
+        ::-webkit-scrollbar-track{
+            background:transparent;
+        }
+
+        ::-webkit-scrollbar-thumb{
+            background:#222;
+            border-radius:20px;
+        }
+    </style>
+</head>
+
+<body class="h-screen flex flex-col">
+
+<header class="h-16 px-8 flex items-center justify-between z-50">
+    <div class="flex items-center gap-4">
+
+        <div class="flex items-center justify-center bg-white p-2 rounded-xl">
+            <i data-lucide="shield" class="w-5 h-5 text-black"></i>
+        </div>
+
+        <div class="flex flex-col">
+            <span class="font-bold text-sm uppercase tracking-widest">
+                Hyperion
+                <span class="opacity-40 font-normal">System Core</span>
+            </span>
+
+            <span class="text-[10px] text-zinc-500 uppercase tracking-[3px]">
+                Build 2.4.0 Stable
+            </span>
+        </div>
+
+    </div>
+
+    <div class="flex items-center gap-8">
+
+        <div class="flex flex-col items-end">
+            <span class="text-[10px] text-zinc-500 uppercase tracking-widest">
+                CPU CLOCK
+            </span>
+
+            <span class="text-sm font-bold mono" id="cpu-load">
+                CPU 4.20 GHz
+            </span>
+        </div>
+
+        <div class="h-8 w-px bg-white/10"></div>
+
+        <div class="flex flex-col items-end">
+            <span class="text-[10px] text-zinc-500 uppercase tracking-widest">
+                UPTIME
+            </span>
+
+            <span class="text-sm font-bold mono">
+                04:12:44
+            </span>
+        </div>
+
+    </div>
+</header>
+
+<div class="flex-1 flex overflow-hidden">
+
+    <aside class="w-64 border-r border-white/5 flex flex-col p-4 gap-1 bg-black/30 backdrop-blur-xl">
+
+        <div onclick="showPage('dashboard', this)" class="sidebar-item active p-3 rounded-xl flex items-center gap-3 text-zinc-400 hover:text-white">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+            <span class="text-sm font-medium">Genel Bakış</span>
+        </div>
+
+        <div onclick="showPage('performance', this)" class="sidebar-item p-3 rounded-xl flex items-center gap-3 text-zinc-400 hover:text-white">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            <span class="text-sm font-medium">Performans</span>
+        </div>
+
+        <div onclick="showPage('maintenance', this)" class="sidebar-item p-3 rounded-xl flex items-center gap-3 text-zinc-400 hover:text-white">
+            <i data-lucide="settings-2" class="w-4 h-4"></i>
+            <span class="text-sm font-medium">Bakım & Araçlar</span>
+        </div>
+
+        <div class="mt-auto pt-4 border-t border-white/5">
+
+            <div class="p-3 flex items-center justify-between text-zinc-500">
+
+                <span class="text-[10px] uppercase tracking-widest">
+                    Temizlik
+                </span>
+
+                <button onclick="runTask('cleanup')">
+                    <i data-lucide="trash-2" class="w-4 h-4 hover:text-red-400 transition-colors"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8">
+
+        <div class="max-w-5xl mx-auto">
+
+            <!-- DASHBOARD -->
+            <div id="page-dashboard" class="page-content active">
+
+                <div class="panel p-8 flex items-center justify-between">
+
+                    <div class="space-y-3">
+
+                        <h2 class="text-4xl font-bold uppercase tracking-tight">
+                            Sistem
+                            <br>
+                            Optimizasyonu
+                        </h2>
+
+                        <p class="text-zinc-500 text-sm max-w-lg">
+                            Hyperion Kernel Engine, Pardus üzerindeki sistem gecikmelerini minimize eder ve çekirdek seviyesinde iyileştirmeler uygular.
+                        </p>
+
+                    </div>
+
+                    <button id="main-action" onclick="runTask('optimize')" class="btn-primary">
+                        Optimize Et
+                    </button>
+
+                </div>
+
+                <div class="grid grid-cols-3 gap-6">
+
+                    <div class="panel p-5 space-y-4">
+
+                        <div class="flex items-center gap-3 text-blue-400">
+                            <i data-lucide="waves" class="w-5 h-5"></i>
+
+                            <h3 class="text-sm font-semibold uppercase tracking-wider">
+                                Audio Stack
+                            </h3>
+                        </div>
+
+                        <p class="text-xs text-zinc-500">
+                            Düşük gecikmeli Pipewire yapılandırması.
+                        </p>
+
+                        <button onclick="runTask('audio')" class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">
+                            Yapılandır
+                        </button>
+
+                    </div>
+
+                    <div class="panel p-5 space-y-4">
+
+                        <div class="flex items-center gap-3 text-amber-400">
+                            <i data-lucide="activity" class="w-5 h-5"></i>
+
+                            <h3 class="text-sm font-semibold uppercase tracking-wider">
+                                Kernel Tweaks
+                            </h3>
+                        </div>
+
+                        <p class="text-xs text-zinc-500">
+                            ZRAM ve I/O optimizasyonları.
+                        </p>
+
+                        <button onclick="runTask('kernel')" class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">
+                            Uygula
+                        </button>
+
+                    </div>
+
+                    <div class="panel p-5 space-y-4">
+
+                        <div class="flex items-center gap-3 text-emerald-400">
+                            <i data-lucide="globe" class="w-5 h-5"></i>
+
+                            <h3 class="text-sm font-semibold uppercase tracking-wider">
+                                Network
+                            </h3>
+                        </div>
+
+                        <p class="text-xs text-zinc-500">
+                            TCP ve DNS hızlandırma ayarları.
+                        </p>
+
+                        <button onclick="runTask('network')" class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                            Aktifleştir
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PERFORMANCE -->
+            <div id="page-performance" class="page-content">
+
+                <div class="grid grid-cols-2 gap-6">
+
+                    <div class="panel p-6 flex flex-col gap-4">
+
+                        <i data-lucide="monitor" class="w-8 h-8 text-white/20"></i>
+
+                        <h3 class="text-lg font-bold">
+                            Grafik Sürücüleri
+                        </h3>
+
+                        <p class="text-sm text-zinc-500">
+                            NVIDIA / AMD sürücüleri ve Vulkan.
+                        </p>
+
+                        <button onclick="runTask('gpu')" class="btn-outline mt-auto w-fit">
+                            Güncelle
+                        </button>
+
+                    </div>
+
+                    <div class="panel p-6 flex flex-col gap-4">
+
+                        <i data-lucide="gamepad-2" class="w-8 h-8 text-white/20"></i>
+
+                        <h3 class="text-lg font-bold">
+                            Gaming Suite
+                        </h3>
+
+                        <p class="text-sm text-zinc-500">
+                            Steam, Wine, Proton ve Lutris kurulumu.
+                        </p>
+
+                        <button onclick="runTask('gaming')" class="btn-outline mt-auto w-fit">
+                            Kur
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- MAINTENANCE -->
+            <div id="page-maintenance" class="page-content">
+
+                <div class="panel overflow-hidden">
+
+                    <div class="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+
+                        <h3 class="font-bold">
+                            Gelişmiş Araçlar
+                        </h3>
+
+                        <span class="text-[10px] mono text-zinc-500 uppercase">
+                            Sudo Yetkisi Gerekebilir
+                        </span>
+
+                    </div>
+
+                    <div class="divide-y divide-white/5">
+
+                        <div class="p-4 flex items-center justify-between hover:bg-white/[0.01]">
+
+                            <div>
+                                <p class="text-sm font-medium">
+                                    XanMod Pro Kernel
+                                </p>
+
+                                <p class="text-xs text-zinc-500">
+                                    Performans çekirdeği yükle.
+                                </p>
+                            </div>
+
+                            <button onclick="runTask('xanmod')" class="btn-outline">
+                                Başlat
+                            </button>
+
+                        </div>
+
+                        <div class="p-4 flex items-center justify-between hover:bg-white/[0.01]">
+
+                            <div>
+                                <p class="text-sm font-medium">
+                                    Discord & OBS
+                                </p>
+
+                                <p class="text-xs text-zinc-500">
+                                    Yayın araçlarını optimize edilmiş kur.
+                                </p>
+                            </div>
+
+                            <button onclick="runTask('social')" class="btn-outline">
+                                Kur
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- LOG -->
+            <div class="mt-8 panel bg-black/40 p-4 flex items-center gap-4">
+
+                <div id="status-indicator" class="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>
+
+                <div class="flex flex-col">
+
+                    <span class="text-[10px] text-zinc-500 uppercase tracking-widest leading-none mb-1">
+                        Sistem Günlüğü
+                    </span>
+
+                    <span id="terminal-msg" class="text-xs mono text-zinc-400">
+                        Sistem kararlı. Giriş bekleniyor...
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    lucide.createIcons();
+
+    function showPage(pageId, element){
+
+        document.querySelectorAll('.page-content')
+            .forEach(p => p.classList.remove('active'));
+
+        document.querySelectorAll('.sidebar-item')
+            .forEach(i => i.classList.remove('active'));
+
+        document
+            .getElementById('page-' + pageId)
+            .classList.add('active');
+
+        element.classList.add('active');
+
+        log(`Navigasyon: ${pageId.toUpperCase()} sekmesine geçildi.`);
+    }
+
+    function log(message, type='info'){
+
+        const terminal =
+            document.getElementById('terminal-msg');
+
+        terminal.innerText = message;
+
+        const indicator =
+            document.getElementById('status-indicator');
+
+        if(type === 'processing'){
+            indicator.className =
+                "w-2.5 h-2.5 bg-amber-500 animate-pulse rounded-full";
+        }
+        else if(type === 'error'){
+            indicator.className =
+                "w-2.5 h-2.5 bg-red-500 rounded-full";
+        }
+        else{
+            indicator.className =
+                "w-2.5 h-2.5 bg-emerald-500 rounded-full";
+        }
+    }
+
+    async function runTask(task){
+
+        log(`İşlem yürütülüyor: ${task.toUpperCase()}...`, 'processing');
+
+        const mainBtn =
+            document.getElementById('main-action');
+
+        if(task === 'optimize')
+            mainBtn.disabled = true;
+
+        if(window.pywebview){
+
+            try{
+
+                let result = "";
+
+                switch(task){
+
+                    case 'optimize':
+                        result = await pywebview.api.pop_os_core_boost();
+                        break;
+
+                    case 'audio':
+                        result = await pywebview.api.setup_audio();
+                        break;
+
+                    case 'kernel':
+                        result = await pywebview.api.optimize_cpu_kernel();
+                        break;
+
+                    case 'network':
+                        result = await pywebview.api.apply_pro_tweaks();
+                        break;
+
+                    case 'gpu':
+                        result = await pywebview.api.install_gpu_drivers();
+                        break;
+
+                    case 'gaming':
+                        result = await pywebview.api.install_gaming_suite();
+                        break;
+
+                    case 'cleanup':
+                        result = await pywebview.api.cleanup_system();
+                        break;
+
+                    case 'xanmod':
+                        result = await pywebview.api.optimize_cpu_kernel();
+                        break;
+
+                    case 'social':
+                        result = await pywebview.api.install_social_obs();
+                        break;
+
+                    default:
+                        result = "Bilinmeyen görev.";
+                }
+
+                log(`Başarılı: ${result}`, 'info');
+
+            }catch(e){
+
+                log(`Hata: İşlem gerçekleştirilemedi.`, 'error');
+
+            }
+
+        }else{
+
+            setTimeout(() => {
+
+                log(`Simülasyon: ${task.toUpperCase()} tamamlandı.`, 'info');
+
+                if(task === 'optimize')
+                    mainBtn.disabled = false;
+
+            }, 2000);
+
+        }
+
+    }
+
+    setInterval(() => {
+
+        const freq =
+            (Math.random() * (5.1 - 4.2) + 4.2).toFixed(2);
+
+        document.getElementById('cpu-load')
+            .innerText = `CPU ${freq} GHz`;
+
+    }, 1200);
+</script>
+
 </body>
 </html>
