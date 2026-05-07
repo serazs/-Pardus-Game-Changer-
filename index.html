@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pardus Hyperion - Pop!_OS Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { --pure-black: #000000; --accent-white: #ffffff; --glass-border: rgba(255, 255, 255, 0.1); --glass-bg: rgba(255, 255, 255, 0.02); }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--pure-black); color: var(--accent-white); -webkit-font-smoothing: antialiased; overflow: hidden; }
+        .font-heading { font-family: 'Space Grotesk', sans-serif; }
+        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0); background-size: 32px 32px; z-index: -1; }
+        .cyber-panel { background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(30px); border-radius: 1.25rem; transition: all 0.4s ease; }
+        .cyber-panel:hover { border-color: rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.04); }
+        .page-content { display: none; animation: slideIn 0.4s ease-out; }
+        .page-content.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar-icon { cursor: pointer; transition: all 0.4s; padding: 1rem; border-radius: 1rem; color: rgba(255,255,255,0.2); }
+        .sidebar-icon.active { color: white; background: rgba(255,255,255,0.08); }
+        .fan-spin { animation: spin 2s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.01) 50%, transparent 50%); background-size: 100% 4px; z-index: 100; pointer-events: none; opacity: 0.3; }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <div class="grid-bg"></div>
+    <div class="scan-line"></div>
+
+    <header class="h-20 px-10 flex items-center justify-between border-b border-white/10 bg-black/60 backdrop-blur-3xl z-50">
+        <div class="flex items-center gap-6">
+            <div class="w-12 h-12 bg-white flex items-center justify-center rounded-xl">
+                <i data-lucide="zap" class="w-7 h-7 text-black"></i>
+            </div>
+            <div>
+                <h1 class="font-heading font-black text-2xl tracking-tighter uppercase">PARDUS <span class="font-light opacity-30">HYPERION</span></h1>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-[9px] font-bold text-white/40 tracking-widest uppercase">Pop!_OS Engine v2.0</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col items-end">
+            <span class="text-[9px] font-bold text-white/20 uppercase">CPU CLOCK</span>
+            <span class="text-xl font-heading font-bold" id="clock-speed">4.20 GHz</span>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        <aside class="w-24 border-r border-white/10 flex flex-col items-center py-10 gap-6 bg-black/40">
+            <div onclick="showPage('dashboard', this)" class="sidebar-icon active"><i data-lucide="layout-dashboard" class="w-6 h-6"></i></div>
+            <div onclick="showPage('gaming', this)" class="sidebar-icon"><i data-lucide="gamepad-2" class="w-6 h-6"></i></div>
+            <div onclick="showPage('system', this)" class="sidebar-icon"><i data-lucide="cpu" class="w-6 h-6"></i></div>
+            <div class="mt-auto" onclick="runTask('cleanup')"><i data-lucide="trash-2" class="w-6 h-6 text-white/20 hover:text-red-500 cursor-pointer"></i></div>
+        </aside>
+
+        <main class="flex-1 p-10 overflow-y-auto">
+            <div class="max-w-[1200px] mx-auto">
+                
+                <div id="page-dashboard" class="page-content active space-y-6">
+                    <div class="cyber-panel p-10 relative overflow-hidden group">
+                        <h2 class="text-6xl font-heading font-black tracking-tighter mb-4 leading-none uppercase">Core<br>Gaming Boost</h2>
+                        <p class="text-white/40 max-w-md mb-8 text-sm">Pop!_OS çekirdek optimizasyonlarını, GameMode ve Vulkan kütüphanelerini Pardus'a entegre eder.</p>
+                        <button onclick="runTask('pop_core')" class="px-10 py-4 bg-white text-black font-black text-xs tracking-widest rounded-xl hover:scale-105 transition-all uppercase">Sistemi Yükselt</button>
+                        <i data-lucide="zap" class="absolute -right-10 -bottom-10 w-64 h-64 text-white/[0.02] -rotate-12"></i>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="cyber-panel p-6 border-blue-500/20">
+                            <i data-lucide="music" class="w-8 h-8 text-blue-500 mb-4"></i>
+                            <h3 class="font-bold mb-1 uppercase text-sm">Low-Latency Audio</h3>
+                            <p class="text-white/40 text-[11px] mb-4">Pipewire ile ses gecikmesini sıfıra indirin.</p>
+                            <button onclick="runTask('audio')" class="text-[10px] font-black text-blue-500 uppercase">Aktif Et</button>
+                        </div>
+                        <div class="cyber-panel p-6 border-yellow-500/20">
+                            <i data-lucide="layers" class="w-8 h-8 text-yellow-500 mb-4"></i>
+                            <h3 class="font-bold mb-1 uppercase text-sm">Pro Tweaks</h3>
+                            <p class="text-white/40 text-[11px] mb-4">ZRAM ve Network paket optimizasyonu.</p>
+                            <button onclick="runTask('pro_tweaks')" class="text-[10px] font-black text-yellow-500 uppercase">Uygula</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-gaming" class="page-content space-y-6">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="cyber-panel p-8">
+                            <i data-lucide="monitor" class="w-10 h-10 mb-6 text-green-500"></i>
+                            <h3 class="text-xl font-bold mb-2">Graphics & GPU</h3>
+                            <button onclick="runTask('gpu')" class="w-full py-4 bg-white/5 border border-white/10 rounded-xl font-bold text-[10px] uppercase">Sürücüleri Kur</button>
+                        </div>
+                        <div class="cyber-panel p-8">
+                            <i data-lucide="play-circle" class="w-10 h-10 mb-6 text-indigo-500"></i>
+                            <h3 class="text-xl font-bold mb-2">Steam & Suite</h3>
+                            <button onclick="runTask('gaming_suite')" class="w-full py-4 bg-white/5 border border-white/10 rounded-xl font-bold text-[10px] uppercase">Platformları Kur</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-system" class="page-content space-y-6">
+                    <div class="cyber-panel p-8 flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <i data-lucide="fan" class="w-12 h-12 fan-spin text-red-500"></i>
+                            <div>
+                                <h3 class="font-bold text-lg uppercase">XanMod Pro Kernel</h3>
+                                <p class="text-white/40 text-[11px] uppercase tracking-widest font-bold">Performans Odaklı Çekirdek</p>
+                            </div>
+                        </div>
+                        <button onclick="runTask('kernel')" class="px-8 py-3 bg-white text-black font-black text-[10px] rounded-lg uppercase">Yükle</button>
+                    </div>
+                    <div class="cyber-panel p-8 flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <i data-lucide="message-square" class="w-12 h-12 text-purple-500"></i>
+                            <div>
+                                <h3 class="font-bold text-lg uppercase">Social & Stream</h3>
+                                <p class="text-white/40 text-[11px] uppercase tracking-widest font-bold">Discord & OBS Studio</p>
+                            </div>
+                        </div>
+                        <button onclick="runTask('social')" class="px-8 py-3 bg-purple-600 font-black text-[10px] rounded-lg uppercase">Hepsini Kur</button>
+                    </div>
+                </div>
+
+                <div class="mt-10 cyber-panel p-5 bg-black/60 font-mono text-[10px] border-white/5 flex items-center gap-4">
+                    <div id="status-dot" class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span id="terminal-msg" class="text-white/50 uppercase tracking-widest">Sistem hazır, emirlerinizi bekliyorum...</span>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        function showPage(pId, el) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pId).classList.add('active');
+            document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+        function log(m) { document.getElementById('terminal-msg').innerText = m; }
+        
+        async function runTask(task) {
+            const dot = document.getElementById('status-dot');
+            dot.className = "w-2 h-2 bg-yellow-500 animate-ping";
+            log(`[İSLEM] ${task.toUpperCase()} YÜRÜTÜLÜYOR...`);
+
+            if (window.pywebview) {
+                let res = "";
+                if(task === 'pop_core') res = await pywebview.api.pop_os_core_boost();
+                if(task === 'gpu') res = await pywebview.api.install_gpu_drivers();
+                if(task === 'gaming_suite') res = await pywebview.api.install_gaming_suite();
+                if(task === 'social') res = await pywebview.api.install_social_obs();
+                if(task === 'kernel') res = await pywebview.api.optimize_cpu_kernel();
+                if(task === 'cleanup') res = await pywebview.api.cleanup_system();
+                if(task === 'audio') res = await pywebview.api.setup_audio();
+                if(task === 'pro_tweaks') res = await pywebview.api.apply_pro_tweaks();
+                
+                log(`[TAMAMLANDI] ${res}`);
+                dot.className = "w-2 h-2 bg-green-500";
+            }
+        }
+
+        setInterval(() => {
+            const freq = (Math.random() * (4.8 - 4.1) + 4.1).toFixed(2);
+            document.getElementById('clock-speed').innerText = freq + " GHz";
+        }, 1500);
+    </script>
+</body>
+</html>

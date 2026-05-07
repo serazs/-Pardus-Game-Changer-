@@ -1,10 +1,4 @@
-# Pardus Game-Changer 🚀
-Bu araç, Pardus Linux kullanıcılarının sistemlerini tek tıkla oyun için optimize etmesini sağlar.
-
-### Özellikler:
-- **XanMod Kernel:** Daha akıcı bir oyun deneyimi için çekirdek optimizasyonu.
-- **NVIDIA Otomasyonu:** Sürücüleri ve ayar panelini otomatik kurar.
-- **Gamer Tools:** Steam, Lutris ve Wine kurulumunu tek tıkla yapar.
-
-### Nasıl Çalıştırılır?
-`python3 main.py`
+pywebview[gtk]>=4.0
+setuptools
+pycairo
+PyGObject
